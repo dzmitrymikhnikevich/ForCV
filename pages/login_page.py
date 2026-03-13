@@ -8,8 +8,8 @@ class LoginPage(BasePage):
 
     PAGE_URL = Links.LOGIN_PAGE
 
-    EMAIL_ADDRESS_FIELD = ("xpath", "//input[@id='email']")
-    PASSWORD_FIELD = ("xpath", "//input[@id='password']")
+    EMAIL_ADDRESS_FIELD = ("xpath", "//input[@data-test='email']")
+    PASSWORD_FIELD = ("xpath", "//input[@data-test='password']")
     LOGIN_BUTTON = ("xpath", "//input[@data-test='login-submit']")
 
     @allure.step("Указать почту")
