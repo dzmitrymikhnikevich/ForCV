@@ -1,4 +1,5 @@
 import allure
+import os
 from allure_commons.types import AttachmentType
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -9,6 +10,8 @@ class BasePage:
 
     def __init__(self, driver):
         self.driver = driver
+        # Увеличиваем таймаут для CI/CD окружения
+        timeout = 30 if os.getenv('CI') else 10  # 30 сек для GitHub, 10 для локалки
         self.wait = WebDriverWait(driver, 10, poll_frequency=1)
 
 
