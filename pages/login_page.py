@@ -14,6 +14,7 @@ class LoginPage(BasePage):
 
     @allure.step("Указать почту")
     def enter_email(self, email):
+        self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
         self.wait.until(EC.element_to_be_clickable(self.EMAIL_ADDRESS_FIELD)).send_keys(email)
 
     @allure.step("Указать пароль")
