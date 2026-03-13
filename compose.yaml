@@ -1,0 +1,6 @@
+services:
+  forcv:
+    image: forcv
+    build:
+      context: .
+      dockerfile: ./Dockerfile
