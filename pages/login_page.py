@@ -175,20 +175,51 @@ class LoginPage(BasePage):
 
     @allure.step("Кликнуть по кнопке авторизироваться")
     def click_submit_button(self):
-        self.wait.until(EC.element_to_be_clickable(self.LOGIN_BUTTON)).click()
-
-        # ВАЖНО: Ждем, пока кнопка исчезнет или URL изменится
-        time.sleep(2)  # Небольшая пауза для обработки
-    
-        # Ждем либо исчезновения кнопки, либо изменения URL
-        try:
-            WebDriverWait(self.driver, 10).until(
-                EC.invisibility_of_element_located(self.LOGIN_BUTTON)
-            )
-            print("✓ Login button disappeared - login successful")
-        except:
-            print("⚠️ Login button still visible, checking URL...")
-    
-        # Проверяем, что URL изменился
+        print("\n" + "="*50)
+        print("🔍 Clicking submit button")
+        print(f"URL before click: {self.driver.current_url}")
+        
+        # Находим и кликаем кнопку
+        submit_button = self.wait.until(EC.element_to_be_clickable(self.LOGIN_BUTTON))
+        
+        # Сохраняем скриншот перед кликом
+        self.make_screenshot("before_login_click")
+        
+        # Кликаем
+        submit_button.click()
+        print("✓ Submit button clicked")
+        
+        # Ждем 2 секунды
+        time.sleep(2)
+        
+        # Проверяем URL после клика
         current_url = self.driver.current_url
-        print(f"URL after login: {current_url}")
+        print(f"URL after click (2s): {current_url}")
+        
+        # Сохраняем скриншот после клика
+        self.make_screenshot("after_login_click")
+        
+        # Проверяем, есть ли сообщение об ошибке
+        try:
+            error_message = self.driver.find_element(By.XPATH, "//*[contains(@class, 'error')]")
+            if error_message:
+                print(f"❌ Error message found: {error_message.text}")
+        except:
+            print("✓ No error message found")
+        
+        # Проверяем, изменился ли URL
+        if current_url == Links.LOGIN_PAGE:
+            print("⚠️ Still on login page - login might have failed")
+            
+            # Ищем любые инпуты - возможно, мы все еще на странице логина
+            inputs = self.driver.find_elements(By.TAG_NAME, "input")
+            print(f"Still have {len(inputs)} inputs on page")
+            
+            # Сохраняем HTML для анализа
+            html_content = self.driver.page_source
+            with open("login_page_after_click.html", "w") as f:
+                f.write(html_content)
+            
+            raise Exception("Login failed - still on login page after clicking submit")
+        else:
+            print(f"✓ URL changed to: {current_url}")

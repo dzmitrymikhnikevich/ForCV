@@ -23,6 +23,14 @@ class TestProfileFeature(BaseTest):
             self.login_page.enter_email(self.data.EMAIL)
             self.login_page.enter_password(self.data.PASSWORD)
             self.login_page.click_submit_button()
+            
+            # Явно ждем URL страницы аккаунта
+            self.wait.until(
+                EC.url_contains("/account"),
+                message="URL не содержит /account после логина"
+            )
+            print(f"✓ Successfully redirected to account page: {self.driver.current_url}")
+            
             #self.my_account_page.is_opened()
             self.my_account_page.click_nav_profile()
             new_name = f"Test {random.randint(1, 100)}"
