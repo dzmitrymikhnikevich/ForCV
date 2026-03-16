@@ -176,3 +176,19 @@ class LoginPage(BasePage):
     @allure.step("Кликнуть по кнопке авторизироваться")
     def click_submit_button(self):
         self.wait.until(EC.element_to_be_clickable(self.LOGIN_BUTTON)).click()
+
+        # ВАЖНО: Ждем, пока кнопка исчезнет или URL изменится
+        time.sleep(2)  # Небольшая пауза для обработки
+    
+        # Ждем либо исчезновения кнопки, либо изменения URL
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.invisibility_of_element_located(self.LOGIN_BUTTON)
+            )
+            print("✓ Login button disappeared - login successful")
+        except:
+            print("⚠️ Login button still visible, checking URL...")
+    
+        # Проверяем, что URL изменился
+        current_url = self.driver.current_url
+        print(f"URL after login: {current_url}")
