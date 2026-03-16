@@ -9,9 +9,9 @@ class LoginPage(BasePage):
 
     PAGE_URL = Links.LOGIN_PAGE
 
-    EMAIL_ADDRESS_FIELD = ("xpath", "//input[@data-test='email']")
-    PASSWORD_FIELD = ("xpath", "//input[@data-test='password']")
-    LOGIN_BUTTON = ("xpath", "//input[@data-test='login-submit']")
+    EMAIL_ADDRESS_FIELD = (By.XPATH, "//input[@data-test='email']")
+    PASSWORD_FIELD = (By.XPATH, "//input[@data-test='password']")
+    LOGIN_BUTTON = (By.XPATH, "//input[@data-test='login-submit']")
 
     @allure.step("Указать почту")
     def enter_email(self, email):

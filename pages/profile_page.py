@@ -2,6 +2,7 @@ import allure
 import time
 from base.base_page import BasePage
 from config.links import Links
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 
@@ -10,9 +11,9 @@ class ProfilePage(BasePage):
 
     PAGE_URL = Links.PROFILE_PAGE
 
-    FIRST_NAME_FIELD = ("xpath", "//input[@data-test='first-name']")
-    UPDATE_PROFILE_BUTTON = ("xpath", "//button[@data-test='update-profile-submit']")
-    SUCCESS_MESSAGE = ("xpath", "//div[@role='alert' and contains(@class, 'alert-success')]")
+    FIRST_NAME_FIELD = (By.XPATH, "//input[@data-test='first-name']")
+    UPDATE_PROFILE_BUTTON = (By.XPATH, "//button[@data-test='update-profile-submit']")
+    SUCCESS_MESSAGE = (By.XPATH, "//div[@role='alert' and contains(@class, 'alert-success')]")
 
 
     def get_first_name_value(self):

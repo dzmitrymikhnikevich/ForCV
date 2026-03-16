@@ -1,5 +1,6 @@
 from base.base_page import BasePage
 from config.links import Links
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 
@@ -7,18 +8,18 @@ class registerPage(BasePage):
 
     PAGE_URL = Links.REGISTER_PAGE
 
-    FIRST_NAME_FIELD = ("xpath", "//input[@data-test='first-name']")
-    LAST_NAME_FIELD = ("xpath", "//input[@data-test='last-name']")
-    DATE_OF_BIRTH_FIELD = ("xpath", "//input[@data-test='dob']")
-    STREET_FIELD = ("xpath", "//input[@data-test='street']")
-    POSTAL_CODE_FIELD = ("xpath", "//input[@data-test='postal-code']")
-    CITY_FIELD = ("xpath", "//input[@data-test='city']")
-    STATE_FIELD = ("xpath", "//input[@data-test='state']")
-    COUNTRY_FIELD = ("xpath", "//input[@data-test='country']")
-    PHONE_FIELD = ("xpath", "//input[@data-test='phone']")
-    EMAIL_FIELD = ("xpath", "//input[@data-test='email']")
-    PASSWORD_FIELD = ("xpath", "//input[@data-test='password']")
-    REGISTER_BUTTON = ("xpath", "//input[@data-test='register-submit']")
+    FIRST_NAME_FIELD = (By.XPATH, "//input[@data-test='first-name']")
+    LAST_NAME_FIELD = (By.XPATH, "//input[@data-test='last-name']")
+    DATE_OF_BIRTH_FIELD = (By.XPATH, "//input[@data-test='dob']")
+    STREET_FIELD = (By.XPATH, "//input[@data-test='street']")
+    POSTAL_CODE_FIELD = (By.XPATH, "//input[@data-test='postal-code']")
+    CITY_FIELD = (By.XPATH, "//input[@data-test='city']")
+    STATE_FIELD = (By.XPATH, "//input[@data-test='state']")
+    COUNTRY_FIELD = (By.XPATH, "//input[@data-test='country']")
+    PHONE_FIELD = (By.XPATH, "//input[@data-test='phone']")
+    EMAIL_FIELD = (By.XPATH, "//input[@data-test='email']")
+    PASSWORD_FIELD = (By.XPATH, "//input[@data-test='password']")
+    REGISTER_BUTTON = (By.XPATH, "//input[@data-test='register-submit']")
 
 
     def enter_first_name(self, first_name):
