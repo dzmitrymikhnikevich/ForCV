@@ -17,13 +17,27 @@ class BasePage:
 
 
     def open(self):
-        if not hasattr(self, 'PAGE_URL') or self.PAGE_URL is None:
-            raise AttributeError("PAGE_URL must be defined in child class")
-    
         with allure.step(f"Open {self.PAGE_URL} page"):
             self.driver.get(self.PAGE_URL)
-            # Ждем загрузки страницы
+        
+            # Ждем загрузки
             self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        
+            # Проверяем, что URL соответствует ожидаемому
+            current_url = self.driver.current_url
+            allure.attach(
+                f"Expected: {self.PAGE_URL}\nActual: {current_url}",
+                name="URL after open",
+                attachment_type=allure.attachment_type.TEXT
+            )
+        
+            if current_url != self.PAGE_URL:
+                allure.attach(
+                    f"WARNING: URL mismatch! Expected {self.PAGE_URL}, got {current_url}",
+                    name="URL mismatch",
+                    attachment_type=allure.attachment_type.TEXT
+                )
+                self.make_screenshot("unexpected_page")
 
     def is_opened(self):
         if not hasattr(self, 'PAGE_URL') or self.PAGE_URL is None:
