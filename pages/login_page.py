@@ -7,6 +7,7 @@ from config.links import Links
 from datetime import datetime
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class LoginPage(BasePage):
@@ -25,10 +26,99 @@ class LoginPage(BasePage):
         (By.CSS_SELECTOR, "input[type='email']"),
         (By.CSS_SELECTOR, "input[name='email']"),
     ]
+    
+    # Локаторы для определения Cloudflare страницы
+    CLOUDFLARE_INDICATORS = [
+        (By.XPATH, "//*[contains(text(), 'Just a moment')]"),
+        (By.XPATH, "//*[contains(text(), 'Checking your browser')]"),
+        (By.XPATH, "//*[contains(@id, 'cf-content')]"),
+        (By.XPATH, "//*[contains(@class, 'cf-browser-verification')]"),
+    ]
+
+    def _handle_cloudflare(self):
+        """Обработка Cloudflare защиты"""
+        print("\n" + "="*50)
+        print("🔍 Checking for Cloudflare protection...")
+        
+        # Проверяем, есть ли признаки Cloudflare
+        is_cloudflare = False
+        for indicator in self.CLOUDFLARE_INDICATORS:
+            try:
+                elements = self.driver.find_elements(*indicator)
+                if elements and elements[0].is_displayed():
+                    is_cloudflare = True
+                    print(f"⚠️ Cloudflare detected: {indicator}")
+                    break
+            except:
+                continue
+        
+        # Дополнительная проверка по заголовку
+        if "Just a moment" in self.driver.title or "Checking your browser" in self.driver.title:
+            is_cloudflare = True
+            print(f"⚠️ Cloudflare detected by title: {self.driver.title}")
+        
+        if is_cloudflare:
+            print("⏳ Waiting for Cloudflare to pass...")
+            
+            # Делаем скриншот перед ожиданием
+            cf_screenshot = f"cloudflare_before_{datetime.now().strftime('%H%M%S')}.png"
+            self.driver.save_screenshot(cf_screenshot)
+            print(f"📸 Cloudflare screenshot saved: {cf_screenshot}")
+            
+            # Ждем прохождения Cloudflare (максимум 60 секунд)
+            max_wait_time = 60
+            start_time = time.time()
+            
+            while time.time() - start_time < max_wait_time:
+                # Проверяем, исчезли ли признаки Cloudflare
+                cloudflare_still_present = False
+                
+                for indicator in self.CLOUDFLARE_INDICATORS:
+                    try:
+                        elements = self.driver.find_elements(*indicator)
+                        if elements and elements[0].is_displayed():
+                            cloudflare_still_present = True
+                            break
+                    except:
+                        continue
+                
+                if not cloudflare_still_present and "Just a moment" not in self.driver.title:
+                    print(f"✅ Cloudflare passed after {int(time.time() - start_time)} seconds")
+                    
+                    # Делаем скриншот после прохождения
+                    cf_passed_screenshot = f"cloudflare_after_{datetime.now().strftime('%H%M%S')}.png"
+                    self.driver.save_screenshot(cf_passed_screenshot)
+                    print(f"📸 Cloudflare passed screenshot: {cf_passed_screenshot}")
+                    return True
+                
+                # Ждем 2 секунды перед следующей проверкой
+                time.sleep(2)
+            
+            # Если Cloudflare не прошел за отведенное время
+            print("❌ Cloudflare did not pass within 60 seconds")
+            self.driver.save_screenshot("cloudflare_timeout.png")
+            
+            # Пробуем обновить страницу
+            print("🔄 Refreshing page...")
+            self.driver.refresh()
+            time.sleep(5)
+            
+            # Проверяем еще раз после обновления
+            if "Just a moment" not in self.driver.title:
+                print("✅ Cloudflare passed after refresh")
+                return True
+            
+            raise Exception("Cloudflare protection could not be bypassed")
+        
+        print("✅ No Cloudflare protection detected")
+        return False
 
     @allure.step("Указать почту")
     def enter_email(self, email):
-        # Выводим информацию в консоль (это точно увидим в логах GitHub Actions)
+        # Обрабатываем Cloudflare если есть
+        self._handle_cloudflare()
+        
+        # Выводим информацию в консоль
         print("\n" + "="*50)
         print("DEBUG: enter_email method called")
         print(f"Current URL: {self.driver.current_url}")
@@ -52,7 +142,7 @@ class LoginPage(BasePage):
         self.driver.save_screenshot(screenshot_name)
         print(f"Screenshot saved: {screenshot_name}")
     
-        # Пробуем найти поле email (ваш существующий код)
+        # Пробуем найти поле email
         try:
             email_field = self.wait.until(EC.element_to_be_clickable(self.EMAIL_ADDRESS_FIELD))
             print("✓ Found email field by main locator")
@@ -85,4 +175,4 @@ class LoginPage(BasePage):
 
     @allure.step("Кликнуть по кнопке авторизироваться")
     def click_submit_button(self):
-        self.wait.until(EC.element_to_be_clickable(self.LOGIN_BUTTON)).click()    
+        self.wait.until(EC.element_to_be_clickable(self.LOGIN_BUTTON)).click()
